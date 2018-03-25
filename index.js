@@ -10,13 +10,16 @@ const path = require("path");
  */
 module.exports = function (message, colors, cwd)
 {
-    const fileContent = fs.readFileSync(message.file, "utf-8").split("\n");
-    const relativeFile = path.relative(cwd, message.file);
+    const fileContent = "" !== message.file
+        ? fs.readFileSync(message.file, "utf-8").split("\n")
+        : [];
+    const relativeFile = "" !== message.file
+        ? path.relative(cwd, message.file)
+        : "?";
     const lineStart = Math.max(0, message.line - 2);
     const lineEnd = Math.min(fileContent.length - 1, message.line + 1);
 
     const header = message.severity.substr(0, 1).toUpperCase() + message.severity.substr(1) + " ";
-
 
     console.log("");
     console.log(
@@ -29,22 +32,25 @@ module.exports = function (message, colors, cwd)
     console.log(message.content + " " + colors.gray(`TS${message.code}`));
     console.log("");
 
-    for (let line = lineStart; line <= lineEnd; line++)
+    if (fileContent.length > 0)
     {
-        console.log(
-            colors.gray(("" + line).padStart(5, " ") + "│") +
-            " " +
-            fileContent[line - 1]
-        );
-
-        if (line === message.line)
+        for (let line = lineStart; line <= lineEnd; line++)
         {
             console.log(
-                colors.red("!".padStart(5, " ")) +
-                colors.gray("│") +
+                colors.gray(("" + line).padStart(5, " ") + "│") +
                 " " +
-                " ".repeat(message.character - 1) + colors.red("↑")
+                fileContent[line - 1]
             );
+
+            if (line === message.line)
+            {
+                console.log(
+                    colors.red("!".padStart(5, " ")) +
+                    colors.gray("│") +
+                    " " +
+                    " ".repeat(message.character - 1) + colors.red("↑")
+                );
+            }
         }
     }
 
