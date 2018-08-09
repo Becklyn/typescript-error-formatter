@@ -17,7 +17,7 @@ module.exports = function (message, colors, cwd)
         ? path.relative(cwd, message.file)
         : "?";
     const lineStart = Math.max(0, message.line - 2);
-    const lineEnd = Math.min(fileContent.length - 1, message.line + 1);
+    const lineEnd = Math.min(fileContent.length, message.line + 1);
 
     const header = message.severity.substr(0, 1).toUpperCase() + message.severity.substr(1) + " ";
 
