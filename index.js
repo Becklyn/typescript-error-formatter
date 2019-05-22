@@ -7,36 +7,38 @@ const path = require("path");
  * @param {{code: number, severity: string, content: string, file: string, line: number, character: number}} message
  * @param {chalk} colors
  * @param {string} cwd
+ * @returns {string}
  */
 module.exports = function (message, colors, cwd)
 {
-    const fileContent = "" !== message.file
+    let buffer = [];
+    let fileContent = "" !== message.file
         ? fs.readFileSync(message.file, "utf-8").split("\n")
         : [];
-    const relativeFile = "" !== message.file
+    let relativeFile = "" !== message.file
         ? path.relative(cwd, message.file)
         : "?";
-    const lineStart = Math.max(1, message.line - 2);
-    const lineEnd = Math.min(fileContent.length, message.line + 1);
+    let lineStart = Math.max(1, message.line - 2);
+    let lineEnd = Math.min(fileContent.length, message.line + 1);
 
-    const header = message.severity.substr(0, 1).toUpperCase() + message.severity.substr(1) + " ";
+    let header = message.severity.substr(0, 1).toUpperCase() + message.severity.substr(1) + " ";
 
-    console.log("");
-    console.log(
+    buffer.push("");
+    buffer.push(
         colors.red(header) +
         colors.red("─".repeat(process.stdout.columns - header.length - relativeFile.length - 2)) +
         colors.yellow(" " + relativeFile)
     );
 
-    console.log("");
-    console.log(message.content + " " + colors.gray(`TS${message.code}`));
-    console.log("");
+    buffer.push("");
+    buffer.push(message.content + " " + colors.gray(`TS${message.code}`));
+    buffer.push("");
 
     if (fileContent.length > 0)
     {
         for (let line = lineStart; line <= lineEnd; line++)
         {
-            console.log(
+            buffer.push(
                 colors.gray(("" + line).padStart(5, " ") + "│") +
                 " " +
                 fileContent[line - 1]
@@ -44,7 +46,7 @@ module.exports = function (message, colors, cwd)
 
             if (line === message.line)
             {
-                console.log(
+                buffer.push(
                     colors.red("!".padStart(5, " ")) +
                     colors.gray("│") +
                     " " +
@@ -54,5 +56,6 @@ module.exports = function (message, colors, cwd)
         }
     }
 
-    console.log("");
+    buffer.push("");
+    return buffer.join("\n");
 };
