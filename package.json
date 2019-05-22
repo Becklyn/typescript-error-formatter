@@ -8,5 +8,8 @@
     },
     "homepage": "https://github.com/Becklyn/typescript-error-formatter",
     "license": "BSD-3-Clause",
-    "main": "index.js"
+    "main": "index.js",
+    "devDependencies": {
+        "chalk": "^2.4.2"
+    }
 }
